@@ -1,5 +1,6 @@
 package com.mylib.view;
 
+import com.mylib.dao.LivroDAOImp;
 import com.mylib.model.Livro;
 import com.mylib.model.StatusLeitura;
 
@@ -12,16 +13,20 @@ public class AbaEstante extends JPanel {
 
     private JTable tabela;
     private DefaultTableModel modeloTabela;
-    private JComboBox<String> Ordenacao;
+    private JComboBox<String> ordenacao;
+    private LivroDAOImp dao;
 
     public AbaEstante() {
+        dao = new LivroDAOImp();
         setLayout(new BorderLayout());
 
         // Painel superior com ordenação
         JPanel painelTopo = new JPanel(new FlowLayout(FlowLayout.LEFT));
         painelTopo.add(new JLabel("Ordenar por:"));
-        Ordenacao = new JComboBox<>(new String[]{"Título", "Autor", "Status"});
-        painelTopo.add(Ordenacao);
+        ordenacao = new JComboBox<>(new String[]{"Título", "Autor", "Status"});
+        painelTopo.add(ordenacao);
+        JButton btnAtualizar = new JButton("Atualizar");
+        painelTopo.add(btnAtualizar);
         add(painelTopo, BorderLayout.NORTH);
 
         // Tabela
@@ -47,19 +52,75 @@ public class AbaEstante extends JPanel {
         painelBotoes.add(btnRemover);
         add(painelBotoes, BorderLayout.SOUTH);
 
-        dadosTeste();
+        // Conectar ordenação
+        ordenacao.addActionListener(e -> carregarDados());
+
+        // Conectar botão Atualizar
+        btnAtualizar.addActionListener(e -> carregarDados());
+
+        // Conectar botão Alterar Status
+        btnAlterarStatus.addActionListener(e -> {
+            int linhaSelecionada = tabela.getSelectedRow();
+            if (linhaSelecionada == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um livro primeiro.");
+                return;
+            }
+            int id = (int) modeloTabela.getValueAt(linhaSelecionada, 0);
+            StatusLeitura[] opcoes = StatusLeitura.values();
+            StatusLeitura escolha = (StatusLeitura) JOptionPane.showInputDialog(
+                    this, "Selecione o novo status:", "Alterar Status",
+                    JOptionPane.PLAIN_MESSAGE, null, opcoes, opcoes[0]
+            );
+            if (escolha != null) {
+                dao.atualizarStatus(id, escolha);
+                carregarDados();
+            }
+        });
+
+        // Conectar botão Avaliar
+        btnAvaliar.addActionListener(e -> {
+            int linhaSelecionada = tabela.getSelectedRow();
+            if (linhaSelecionada == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um livro primeiro.");
+                return;
+            }
+            int id = (int) modeloTabela.getValueAt(linhaSelecionada, 0);
+            String[] estrelas = {"1 ★", "2 ★", "3 ★", "4 ★", "5 ★"};
+            String escolha = (String) JOptionPane.showInputDialog(
+                    this, "Selecione a avaliação:", "Avaliar",
+                    JOptionPane.PLAIN_MESSAGE, null, estrelas, estrelas[0]
+            );
+            if (escolha != null) {
+                int nota = Integer.parseInt(escolha.substring(0, 1));
+                dao.atualizarAvaliacao(id, nota);
+                carregarDados();
+            }
+        });
+
+        // Conectar botão Remover
+        btnRemover.addActionListener(e -> {
+            int linhaSelecionada = tabela.getSelectedRow();
+            if (linhaSelecionada == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um livro primeiro.");
+                return;
+            }
+            int id = (int) modeloTabela.getValueAt(linhaSelecionada, 0);
+            int confirmacao = JOptionPane.showConfirmDialog(
+                    this, "Remover este livro da estante?", "Confirmar",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (confirmacao == JOptionPane.YES_OPTION) {
+                dao.removerDaEstante(id);
+                carregarDados();
+            }
+        });
+
+        carregarDados();
     }
 
-    private void dadosTeste() {
-        List<Livro> livros = List.of(
-                new Livro(1, "Dom Casmurro", "Machado de Assis", "Romance", 1899,
-                        StatusLeitura.LIDO, 5, true),
-                new Livro(2, "1984", "George Orwell", "Distopia", 1949,
-                        StatusLeitura.LENDO, 0, true),
-                new Livro(3, "O Pequeno Príncipe", "Saint-Exupéry", "Fábula", 1943,
-                        StatusLeitura.META, 0, true)
-        );
-        atualizarTabela(livros);
+    public void carregarDados() {
+        String ordemSelecionada = (String) ordenacao.getSelectedItem();
+        atualizarTabela(dao.buscarEstanteOrdenada(ordemSelecionada));
     }
 
     public void atualizarTabela(List<Livro> livros) {
