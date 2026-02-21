@@ -29,7 +29,7 @@ public class AbaBiblioteca extends JPanel {
         add(painelTopo, BorderLayout.NORTH);
 
         // Tabela
-        String[] colunas = {"ID", "Título", "Autor", "Gênero", "Ano", "Na Estante?"};
+        String[] colunas = {"ID", "Título", "Autor", "Gênero", "Ano", "Estante"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -39,6 +39,14 @@ public class AbaBiblioteca extends JPanel {
         tabela = new JTable(modeloTabela);
         tabela.getColumnModel().getColumn(0).setMinWidth(0);
         tabela.getColumnModel().getColumn(0).setMaxWidth(0);
+
+        // Larguras das colunas
+        tabela.getColumnModel().getColumn(1).setPreferredWidth(250); // Título
+        tabela.getColumnModel().getColumn(2).setPreferredWidth(180); // Autor
+        tabela.getColumnModel().getColumn(3).setPreferredWidth(100); // Gênero
+        tabela.getColumnModel().getColumn(4).setPreferredWidth(50);  // Ano
+        tabela.getColumnModel().getColumn(5).setPreferredWidth(60);  // Estante
+
         add(new JScrollPane(tabela), BorderLayout.CENTER);
 
         // Painel inferior com botões
