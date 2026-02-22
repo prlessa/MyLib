@@ -9,6 +9,8 @@ public interface LivroDAO {
 
     // Salva um livro novo no banco
     void salvar(Livro livro);
+    void deletar(int id);
+    void atualizar(Livro livro);
 
     // Busca todos os livros da biblioteca
     List<Livro> buscarBiblioteca();

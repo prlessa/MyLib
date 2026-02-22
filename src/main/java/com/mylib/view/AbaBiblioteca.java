@@ -2,6 +2,7 @@ package com.mylib.view;
 
 import com.mylib.dao.LivroDAOImp;
 import com.mylib.model.Livro;
+import com.mylib.model.StatusLeitura;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
@@ -79,13 +80,96 @@ public class AbaBiblioteca extends JPanel {
 
         // Painel inferior com botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton btnAdicionarEstante = new JButton("Adicionar na Estante");
         JButton btnNovoLivro = new JButton("Novo Livro");
-        painelBotoes.add(btnAdicionarEstante);
+        JButton btnAdicionarEstante = new JButton("Adicionar na Estante");
+        JButton btnEditar = new JButton("Editar Livro");
+        JButton btnRemover = new JButton("Remover da Biblioteca");
+
         painelBotoes.add(btnNovoLivro);
+        painelBotoes.add(btnAdicionarEstante);
+        painelBotoes.add(btnEditar);
+        painelBotoes.add(btnRemover);
+
         add(painelBotoes, BorderLayout.SOUTH);
 
         btnAtualizar.addActionListener(e -> carregarDados());
+
+        btnEditar.addActionListener(e -> {
+            int linhaSelecionada = tabela.getSelectedRow();
+            if (linhaSelecionada == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um livro primeiro.");
+                return;
+            }
+            int modelRow = tabela.convertRowIndexToModel(linhaSelecionada);
+            int id = (int) modeloTabela.getValueAt(modelRow, 0);
+            String tituloAtual = (String) modeloTabela.getValueAt(modelRow, 1);
+            String autorAtual = (String) modeloTabela.getValueAt(modelRow, 2);
+            String generoAtual = (String) modeloTabela.getValueAt(modelRow, 3);
+            String anoAtual = String.valueOf(modeloTabela.getValueAt(modelRow, 4));
+
+            JTextField campoTitulo = new JTextField(tituloAtual);
+            JTextField campoAutor = new JTextField(autorAtual);
+            JTextField campoGenero = new JTextField(generoAtual);
+            JTextField campoAno = new JTextField(anoAtual);
+
+            Object[] campos = {
+                    "Título:", campoTitulo,
+                    "Autor:", campoAutor,
+                    "Gênero:", campoGenero,
+                    "Ano:", campoAno
+            };
+
+            int resultado = JOptionPane.showConfirmDialog(
+                    this, campos, "Editar Livro", JOptionPane.OK_CANCEL_OPTION
+            );
+
+            if (resultado == JOptionPane.OK_OPTION) {
+                String titulo = campoTitulo.getText().trim();
+                String autor = campoAutor.getText().trim();
+                String genero = campoGenero.getText().trim();
+                String anoTexto = campoAno.getText().trim();
+
+                if (titulo.isEmpty() || autor.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Título e Autor são obrigatórios.");
+                    return;
+                }
+
+                int ano = 0;
+                if (!anoTexto.isEmpty()) {
+                    try {
+                        ano = Integer.parseInt(anoTexto);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Ano deve ser um número válido.");
+                        return;
+                    }
+                }
+
+                dao.atualizar(new Livro(id, titulo, autor, genero, ano,
+                        StatusLeitura.META, 0, false));
+                carregarDados();
+            }
+        });
+
+        btnRemover.addActionListener(e -> {
+            int linhaSelecionada = tabela.getSelectedRow();
+            if (linhaSelecionada == -1) {
+                JOptionPane.showMessageDialog(this, "Selecione um livro primeiro.");
+                return;
+            }
+            int modelRow = tabela.convertRowIndexToModel(linhaSelecionada);
+            int id = (int) modeloTabela.getValueAt(modelRow, 0);
+            String titulo = (String) modeloTabela.getValueAt(modelRow, 1);
+
+            int confirmacao = JOptionPane.showConfirmDialog(
+                    this, "Remover \"" + titulo + "\" da biblioteca permanentemente?",
+                    "Confirmar Remoção", JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacao == JOptionPane.YES_OPTION) {
+                dao.deletar(id);
+                carregarDados();
+            }
+        });
 
         btnAdicionarEstante.addActionListener(e -> {
             int linhaSelecionada = tabela.getSelectedRow();

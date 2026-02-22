@@ -131,4 +131,23 @@ public class LivroDAOImp implements LivroDAO {
             throw new RuntimeException("Erro ao atualizar livro.", e);
         }
     }
+    @Override
+    public void deletar(int id) {
+        executarUpdate("DELETE FROM livros WHERE id = " + id);
+    }
+
+    @Override
+    public void atualizar(Livro livro) {
+        String sql = "UPDATE livros SET titulo = ?, autor = ?, genero = ?, ano = ? WHERE id = ?";
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, livro.getTitulo());
+            stmt.setString(2, livro.getAutor());
+            stmt.setString(3, livro.getGenero());
+            stmt.setInt(4, livro.getAno());
+            stmt.setInt(5, livro.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar livro.", e);
+        }
+    }
 }
