@@ -46,18 +46,32 @@ public class LivroDAOImp implements LivroDAO {
 
     @Override
     public List<Livro> buscarBiblioteca() {
-        return buscarBibliotecaOrdenada("Título");
+        return buscarBibliotecaOrdenada("Título (A-Z)", "Nenhum");
     }
 
     @Override
-    public List<Livro> buscarBibliotecaOrdenada(String ordenacao) {
-        String ordem = switch (ordenacao) {
-            case "Autor" -> "autor";
-            case "Gênero" -> "genero";
-            default -> "titulo";
+    public List<Livro> buscarBibliotecaOrdenada(String ordenacaoPrimaria, String ordenacaoSecundaria) {
+        String sql = "SELECT * FROM livros ORDER BY " + traduzirColuna(ordenacaoPrimaria);
+        if (ordenacaoSecundaria != null && !ordenacaoSecundaria.equals("Nenhum")) {
+            sql += ", " + traduzirColuna(ordenacaoSecundaria);
+        }
+           return executarConsulta(sql);
+    }
+
+    private String traduzirColuna(String opcao) {
+        return switch (opcao) {
+            case "Título (A-Z)"       -> "titulo ASC";
+            case "Título (Z-A)"       -> "titulo DESC";
+            case "Autor (A-Z)"        -> "autor ASC";
+            case "Autor (Z-A)"        -> "autor DESC";
+            case "Gênero (A-Z)"       -> "genero ASC";
+            case "Gênero (Z-A)"       -> "genero DESC";
+            case "Ano (crescente)"    -> "ano ASC";
+            case "Ano (decrescente)"  -> "ano DESC";
+            case "Estante (S)"        -> "na_estante DESC";
+            case "Estante (N)"        -> "na_estante ASC";
+            default                   -> "titulo ASC";
         };
-        String sql = "SELECT * FROM livros ORDER BY " + ordem;
-        return executarConsulta(sql);
     }
 
     @Override

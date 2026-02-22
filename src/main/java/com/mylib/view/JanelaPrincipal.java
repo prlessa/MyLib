@@ -7,7 +7,7 @@ public class JanelaPrincipal extends JFrame {
 
     public JanelaPrincipal() {
         setTitle("MyLib — Minha Estante Virtual");
-        setSize(900, 600);
+        setSize(700, 450);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

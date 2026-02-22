@@ -14,7 +14,7 @@ public interface LivroDAO {
     List<Livro> buscarBiblioteca();
 
     // Busca todos os livros da biblioteca ordenados
-    List<Livro> buscarBibliotecaOrdenada(String ordenacao);
+    List<Livro> buscarBibliotecaOrdenada(String ordenacaoPrimaria, String ordenacaoSecundaria);
 
     // Busca apenas os livros que estão na estante do usuário
     List<Livro> buscarEstante();
