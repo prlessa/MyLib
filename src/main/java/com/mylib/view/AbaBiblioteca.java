@@ -17,8 +17,6 @@ public class AbaBiblioteca extends JPanel {
     private JTable tabela;
     private JTextField campoPesquisa;
     private DefaultTableModel modeloTabela;
-    private JComboBox<String> ordenacaoPrimaria;
-    private JComboBox<String> ordenacaoSecundaria;
     private LivroDAOImp dao;
 
     public AbaBiblioteca() {

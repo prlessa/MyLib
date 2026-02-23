@@ -15,14 +15,8 @@ public interface LivroDAO {
     // Busca todos os livros da biblioteca
     List<Livro> buscarBiblioteca();
 
-    // Busca todos os livros da biblioteca ordenados
-    List<Livro> buscarBibliotecaOrdenada(String ordenacaoPrimaria, String ordenacaoSecundaria);
-
     // Busca apenas os livros que estão na estante do usuário
     List<Livro> buscarEstante();
-
-    // Busca os livros da estante com ordenação
-    List<Livro> buscarEstanteOrdenada(String ordenacao);
 
     // Move um livro da biblioteca para a estante
     void adicionarNaEstante(int id);

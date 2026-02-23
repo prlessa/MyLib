@@ -46,41 +46,15 @@ public class LivroDAOImp implements LivroDAO {
 
     @Override
     public List<Livro> buscarBiblioteca() {
-        return buscarBibliotecaOrdenada("Título (A-Z)", "Nenhum");
-    }
-
-    @Override
-    public List<Livro> buscarBibliotecaOrdenada(String ordenacaoPrimaria, String ordenacaoSecundaria) {
-        String sql = "SELECT * FROM livros ORDER BY " + traduzirColuna(ordenacaoPrimaria);
-        if (ordenacaoSecundaria != null && !ordenacaoSecundaria.equals("Nenhum")) {
-            sql += ", " + traduzirColuna(ordenacaoSecundaria);
-        }
-           return executarConsulta(sql);
-    }
-
-    private String traduzirColuna(String opcao) {
-        return switch (opcao) {
-            case "Título (A-Z)"       -> "titulo ASC";
-            case "Título (Z-A)"       -> "titulo DESC";
-            case "Autor (A-Z)"        -> "autor ASC";
-            case "Autor (Z-A)"        -> "autor DESC";
-            case "Gênero (A-Z)"       -> "genero ASC";
-            case "Gênero (Z-A)"       -> "genero DESC";
-            case "Ano (crescente)"    -> "ano ASC";
-            case "Ano (decrescente)"  -> "ano DESC";
-            case "Estante (S)"        -> "na_estante DESC";
-            case "Estante (N)"        -> "na_estante ASC";
-            default                   -> "titulo ASC";
-        };
+        return executarConsulta("SELECT * FROM livros ORDER BY titulo ASC");
     }
 
     @Override
     public List<Livro> buscarEstante() {
-        return buscarEstanteOrdenada("Título");
+        return executarConsulta("SELECT * FROM livros WHERE na_estante = 1 ORDER BY titulo ASC");
     }
 
-    @Override
-    public List<Livro> buscarEstanteOrdenada(String ordenacao) {
+    private List<Livro> buscarEstanteOrdenada(String ordenacao) {
         String ordem = switch (ordenacao) {
             case "Autor" -> "autor";
             case "Status" -> "status";
